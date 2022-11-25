@@ -14,16 +14,14 @@ int getRandomNumber(int min, int max) // Нужно делать const int&. Н�
     return static_cast<int>(rand() * fraction * (max - min + 1) + min);
 }
 
-void startingGame(int randNumb) // Тоже const&
+bool playGame(int randNumb, int guesses) // Тоже const&
 {
-    randNumb = getRandomNumber(1, 100); // Вызов функции для получения нового рандомного числа, для каждой последующей игры
-    // Копированик кода getRandomNumber(). Сделай что бы ты раз ее вызывал
-    std::cout << "Let's play a game. I'm thinking of a number. You have 7 tries to guess what it is.\n";
-    int usersGuess;
-    for (int iii = 1; iii <= 7; iii++) // зачем iii, i достаточно 
+    for (int i = 1; i <= guesses; ++i)
     {
-        std::cout << "Guess #" << iii << ":"; // вывод в главной фунции должен быть
+        std::cout << "Guess #" << i << ":"; // вывод в главной фунции должен быть
+        int usersGuess;
         std::cin >> usersGuess; // ввод тоже
+
         if (usersGuess > randNumb)
         {
             std::cout << "Your guess is too high.\n";
@@ -32,49 +30,50 @@ void startingGame(int randNumb) // Тоже const&
         {
             std::cout << "Your guess is too low.\n";
         }
-        else if (usersGuess = randNumb)
+        else
         {
-            std::cout << "Correct! You win!\n";
-            break;
-        }
-        if (iii == 7)
-        {
-            std::cout << "Sorry, you lose. The correct number was " << randNumb << ".\n";
+            return true;
         }
     }
+    return false;
 }
 
-char requestForReplay(int randNumb) // тоже const&. Или указатели но & проще
- // char? Зачем? Ты знаешь зачем тип char???
+bool requestForReplay() // тоже const&. Или указатели но & проще
 {
-    while (true)
+    char letter;
+    do
     {
         std::cout << "Would you like to play again (y/n)? ";
-        char sm;
-        std::cin >> sm;
-
-        if (sm == 'y')
-        {
-            startingGame(randNumb);
-        }
-        else if (sm == 'n')
-        {
-            std::cout << "Thank you for playing.\n";
-            break;
-        }
-    }
-    return 0; // Как return 0 вяжется к char?? 
+        std::cin >> letter;
+    } while (letter != 'y' && letter != 'n');
+    return (letter == 'y');
 }
-// логика игры нарушена
+
 int main()
 {
     srand(static_cast<unsigned int>(time(0))); // устанавка значения системных часов в качестве стартового числа
     rand(); // Первый вызов rand() для сброса результата этой функции (для большего отличия первого рандомного числа от стартового)
-    int randNumb = getRandomNumber(1, 100); // копирование кода
     
-    startingGame(randNumb);
-    requestForReplay(randNumb);
-    
+    const int guesses = 7;
+        
+    do
+    {
+        int randNumb = getRandomNumber(1, 100);
 
+        std::cout << "Let's play a game. I'm thinking of a number. You have " << guesses << " tries to guess what it is.\n";
+
+        bool won = playGame(randNumb, guesses);
+        if (won)
+        {
+            std::cout << "Correct! You win!\n";
+        }
+        else
+        {
+            std::cout << "Sorry, you lose. The correct number was " << randNumb << ".\n";
+        }
+    } 
+    while (requestForReplay());
+    std::cout << "Thank you for playing.\n";
+         
     return 0;
 }
